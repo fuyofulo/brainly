@@ -1,7 +1,8 @@
 import mongoose, { model, Schema } from "mongoose";
-import { MONGO_URL } from "./config";
 
-mongoose.connect(MONGO_URL);
+const mongo_url = process.env.MONGO_URL;
+
+mongoose.connect(mongo_url!);
 
 const UserSchema = new Schema({
     username: {type: String, unique: true},
