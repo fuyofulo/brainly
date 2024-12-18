@@ -7,6 +7,7 @@ import { ShareIcon } from "../icons/ShareIcon"
 import { useContent } from "../hooks/UseContent"
 import { BACKEND_URL } from "../config"
 import axios from "axios"
+import { Header } from "../components/Header"
 
 export function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -16,7 +17,31 @@ export function Dashboard() {
     refresh();
   }, [modalOpen])
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleCreateContent = () => {
+    // Navigate to content creation page or open modal
+    console.log("Creating content...");
+  };
+
+  const handleShareBrain = () => {
+    // Share brain functionality
+    console.log("Sharing brain...");
+  };
+
+  const handleLogin = () => {
+    // Redirect to login page or open login modal
+    console.log("Logging in...");
+    setIsLoggedIn(true); // Simulating login for demo
+  };
+
   return <div>
+    <Header
+        isLoggedIn={isLoggedIn}
+        onCreateContent={handleCreateContent}
+        onShareBrain={handleShareBrain}
+        onLogin={handleLogin}
+      />
     <div className="p-6">
       <CreateContentModal open={modalOpen} onClose={() => {
         setModalOpen(false);
