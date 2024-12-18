@@ -13,12 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("./db");
 const middleware_1 = require("./middleware");
 const utils_1 = require("./utils");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+const corsOptions = {
+    origin: "http://localhost:5173", // Replace with your frontend's URL
+    methods: ["GET", "POST", "DELETE", "PUT"], // Allowed HTTP methods
+    credentials: true, // Allow credentials such as cookies or authorization headers
+};
+app.use((0, cors_1.default)(corsOptions));
 const JWT_PASSWORD = "123123";
 app.post("/api/v1/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // implement zod validation
@@ -73,16 +80,28 @@ app.post("/api/v1/signin", (req, res) => __awaiter(void 0, void 0, void 0, funct
 app.post("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const title = req.body.title;
     const link = req.body.link;
-    yield db_1.ContentModel.create({
-        title,
-        link,
-        //@ts-ignore
-        userId: req.userId,
-        tags: []
-    });
-    res.json({
-        message: "content added"
-    });
+    const type = req.body.type;
+    try {
+        if (!type || !["youtube", "twitter"].includes(type)) {
+            res.status(400).json({ message: "Invalid or missing content type" });
+            return; // Explicitly return void here
+        }
+        yield db_1.ContentModel.create({
+            title,
+            link,
+            type,
+            //@ts-ignore
+            userId: req.userId,
+            tags: []
+        });
+        res.json({
+            message: "content added"
+        });
+    }
+    catch (error) {
+        console.error("Error adding content:", error);
+        res.status(500).json({ message: "Failed to add content" });
+    }
 }));
 app.get("/api/v1/content", middleware_1.userMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //@ts-ignore

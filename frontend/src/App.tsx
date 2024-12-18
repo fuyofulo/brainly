@@ -1,17 +1,17 @@
-import { Button } from "./components/Button"
-import { Card } from "./components/Card"
-import { PlusIcon } from "./icons/PlusIcon"
-import { ShareIcon } from "./icons/Shareicon"
-
+import { Signin } from "./pages/Signin"
+import { Signup } from "./pages/Signup"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Dashboard } from "./pages/Dashboard"
+import AuthCard from "./components/AuthCard"
 function App() {
-
-  return (
-    <div>
-      <Button variant="secondary" text="Share Content" startIcon={<ShareIcon/>}></Button>
-      <Button variant="primary" text="Add Content" startIcon={<PlusIcon/>}></Button>
-      <Card title="X post" link="x.com" type="twitter"/>
-    </div>
-  )
+  return <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<AuthCard />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/signin" element={<Signin />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
+  </BrowserRouter>
 }
 
 export default App

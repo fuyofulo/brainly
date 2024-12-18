@@ -1,12 +1,19 @@
 import express from "express";
+import cors from "cors";
 import jwt from "jsonwebtoken";
 import { ContentModel, LinkModel, UserModel } from "./db";
 import { userMiddleware } from "./middleware";
 import { random } from "./utils";
-import { exit } from "process";
 
 const app = express();
 app.use(express.json());
+
+const corsOptions = {
+    origin: "http://localhost:5173", // Replace with your frontend's URL
+    methods: ["GET", "POST", "DELETE", "PUT"], // Allowed HTTP methods
+    credentials: true, // Allow credentials such as cookies or authorization headers
+  };
+  app.use(cors(corsOptions));
 
 
 const JWT_PASSWORD = "123123";
@@ -72,22 +79,34 @@ app.post("/api/v1/signin", async (req, res) => {
 
 })
 
-app.post("/api/v1/content", userMiddleware, async (req, res) => {
+app.post("/api/v1/content", userMiddleware, async (req, res):Promise<void> => {
 
     
     const title = req.body.title;
     const link = req.body.link;
-    await ContentModel.create({
-        title,
-        link,
-        //@ts-ignore
-        userId: req.userId,
-        tags: []
-    })
+    const type = req.body.type;
 
-    res.json({
-        message: "content added"
-    })
+    try {
+        if (!type || !["youtube", "twitter"].includes(type)) {
+            res.status(400).json({ message: "Invalid or missing content type" });
+            return; // Explicitly return void here
+        }
+        await ContentModel.create({
+            title,
+            link,
+            type,
+            //@ts-ignore
+            userId: req.userId,
+            tags: []
+        })
+
+        res.json({
+            message: "content added"
+        }) 
+    } catch (error) {
+        console.error("Error adding content:", error);
+        res.status(500).json({ message: "Failed to add content" });
+    }
 
 })
 
